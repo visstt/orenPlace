@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  surname   String?
+  email     String   @unique
+  phone     String?
+  city      String?  @default("Оренбург")
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites Favorite[]
+  tickets   Ticket[]
+
+  @@map("users")
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  color String @default("#8E2DE2")
+  icon  String @default("calendar")
+
+  events Event[]
+
+  @@map("categories")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  time        String
+  price       Float    @default(0)
+  address     String
+  isPopular   Boolean  @default(false)
+  images      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  favorites Favorite[]
+  tickets   Ticket[]
+
+  @@map("events")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@map("favorites")
+}
+
+model Ticket {
+  id           String   @id @default(uuid())
+  qrCode       String   @unique
+  purchaseDate DateTime @default(now())
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("tickets")
+}

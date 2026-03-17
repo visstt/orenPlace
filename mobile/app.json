@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Куда сходить в Оренбурге",
+    "slug": "orenplace",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8E2DE2"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ru.orenplace.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#8E2DE2"
+      },
+      "package": "ru.orenplace.app"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}

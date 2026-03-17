@@ -1,0 +1,64 @@
+@startuml
+skinparam rectangleBorderColor Black
+skinparam rectangleBackgroundColor White
+
+package "Mobile Application" {
+  [User Interface] as UI
+  [Navigation] as Nav
+  [State Management] as Store
+  [API Client] as APIClient
+}
+
+package "Backend API (NestJS)" {
+  [Auth Module] as Auth
+  [Users Module] as Users
+  [Events Module] as Events
+  [Categories Module] as Categories
+  [Favorites Module] as Favorites
+  [Tickets Module] as Tickets
+  [File Upload] as Files
+}
+
+database "PostgreSQL" {
+  [User Table] as UserDB
+  [Event Table] as EventDB
+  [Category Table] as CategoryDB
+  [Favorite Table] as FavoriteDB
+  [Ticket Table] as TicketDB
+}
+
+actor "User" as User
+
+User --> UI : Interacts with
+UI --> Nav : Navigate screens
+UI --> Store : Read/Update state
+Store --> APIClient : API requests
+
+APIClient --> Auth : POST /auth/login\nPOST /auth/register
+APIClient --> Users : GET /users/me\nPUT /users/me
+APIClient --> Events : GET /events\nGET /events/:id
+APIClient --> Categories : GET /categories
+APIClient --> Favorites : GET /favorites\nPOST /favorites
+APIClient --> Tickets : GET /tickets\nPOST /tickets
+
+Auth --> UserDB : Authenticate
+Users --> UserDB : CRUD operations
+Users --> Files : Upload avatar
+Events --> EventDB : CRUD operations
+Categories --> CategoryDB : Read operations
+Favorites --> FavoriteDB : CRUD operations
+Favorites --> EventDB : Reference events
+Tickets --> TicketDB : CRUD operations
+Tickets --> EventDB : Reference events
+
+note right of Auth
+  JWT-based
+  authentication
+end note
+
+note right of APIClient
+  HTTP REST API
+  JWT tokens
+end note
+
+@enduml
