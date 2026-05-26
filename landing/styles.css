@@ -218,8 +218,20 @@ a {
 }
 
 .feature__icon {
-  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
   margin-bottom: 0.75rem;
+  border-radius: 12px;
+  color: var(--primary-dark);
+  background: linear-gradient(135deg, rgba(142, 45, 226, 0.14), rgba(74, 0, 224, 0.08));
+}
+
+.feature__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .feature h3 {
