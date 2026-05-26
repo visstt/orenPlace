@@ -78,7 +78,32 @@ eas build -p android --profile production
 
 ---
 
-## 5. Запуск в production
+## 5. Автоматический деплой (рекомендуется)
+
+На сервере (Linux), из корня репозитория:
+
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+Скрипт:
+- копирует `.env` из примеров (если файлов ещё нет);
+- генерирует секреты в `.env.production`;
+- прописывает API `http://89.108.98.72/api` в mobile;
+- собирает админку и APK;
+- копирует APK в `landing/downloads/orenplace.apk`;
+- поднимает Docker.
+
+Опции: `./scripts/deploy.sh --no-apk` (без сборки APK), `FORCE_APK_REBUILD=1 ./scripts/deploy.sh` (пересобрать APK).
+
+На Windows: `.\scripts\deploy.ps1` (нужны Docker Desktop, Java, Android SDK для APK).
+
+IP настраивается в `scripts/deploy.config`.
+
+---
+
+## 5.1. Ручной запуск в production
 
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build

@@ -9,7 +9,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://YOUR_DOMAIN/api"
+        "EXPO_PUBLIC_API_URL": "http://89.108.98.72/api"
       }
     },
     "preview": {

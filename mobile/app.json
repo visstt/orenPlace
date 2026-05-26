@@ -24,7 +24,8 @@
         "backgroundColor": "#8E2DE2"
       },
       "package": "ru.orenplace.app",
-      "versionCode": 1
+      "versionCode": 1,
+      "usesCleartextTraffic": true
     },
     "plugins": [
       "expo-font"

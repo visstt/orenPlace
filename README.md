@@ -74,15 +74,14 @@ npx expo start
 - **Production Docker** — `docker-compose.prod.yml` + nginx
 - Подробная инструкция: **[DEPLOY.md](./DEPLOY.md)**
 
-Быстрый старт prod:
+Автодеплой (на сервере Linux):
 
 ```bash
-cp .env.production.example .env.production
-# отредактируйте секреты
-cd admin && npm ci && npm run build && cd ..
-# положите APK: landing/downloads/orenplace.apk
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
 ```
+
+IP сервера: `89.108.98.72` (меняется в `scripts/deploy.config`).
 
 ---
 
