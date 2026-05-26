@@ -86,7 +86,8 @@ scp landing/downloads/orenplace.apk root@89.108.98.72:/var/www/orenPlace/landing
 **Вариант C — EAS (облако):**
 
 1. В `mobile/eas.json` уже указан `http://89.108.98.72/api`.
-2. Соберите APK:
+2. **Важно:** `mobile/node_modules` не должен быть в git (иначе Gradle на EAS падает). После `git pull` выполните `cd mobile && npm ci`.
+3. Соберите APK:
 
 ```bash
 cd mobile

@@ -5,6 +5,10 @@ backend/.env
 
 # Зависимости и сборки
 node_modules/
+mobile/node_modules/
+mobile/android/
+mobile/ios/
+mobile/.expo/
 **/dist/
 backend/admin-static/
 

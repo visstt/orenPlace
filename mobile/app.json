@@ -24,11 +24,25 @@
         "backgroundColor": "#8E2DE2"
       },
       "package": "ru.orenplace.app",
-      "versionCode": 1,
       "usesCleartextTraffic": true
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "28d79563-5740-4b7f-ab93-7d9e61015f96"
+      }
+    }
   }
 }
