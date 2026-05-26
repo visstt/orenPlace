@@ -77,8 +77,8 @@ npx expo start
 Автодеплой (на сервере Linux):
 
 ```bash
-chmod +x scripts/deploy.sh
-./scripts/deploy.sh
+bash scripts/deploy.sh
+# или: chmod +x scripts/deploy.sh && ./scripts/deploy.sh
 ```
 
 IP сервера: `89.108.98.72` (меняется в `scripts/deploy.config`).

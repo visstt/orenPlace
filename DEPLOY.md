@@ -101,8 +101,10 @@ eas build -p android --profile production
 На сервере (Linux), из корня репозитория:
 
 ```bash
-chmod +x scripts/deploy.sh
+chmod +x scripts/deploy.sh   # если Permission denied
 ./scripts/deploy.sh
+# или без chmod:
+bash scripts/deploy.sh
 ```
 
 Скрипт:
