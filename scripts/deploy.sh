@@ -11,7 +11,7 @@ source "$ROOT/scripts/deploy.config"
 
 SERVER_URL="http://${SERVER_IP}"
 API_URL="${SERVER_URL}/api"
-APK_DEST="$ROOT/landing/downloads/orenplace.apk"
+APK_DEST="$ROOT/landing/public/downloads/orenplace.apk"
 
 SKIP_APK=false
 SKIP_DOCKER=false
@@ -149,6 +149,19 @@ build_admin() {
   ok "admin → backend/admin-static"
 }
 
+build_landing() {
+  log "Сборка лендинга (React + Framer Motion)"
+  cd "$ROOT/landing"
+  if [[ -f package-lock.json ]]; then
+    npm ci
+  else
+    npm install
+  fi
+  npm run build
+  cd "$ROOT"
+  ok "landing → landing/dist"
+}
+
 ensure_mobile_assets() {
   local assets="$ROOT/mobile/assets"
   local defaults="$ROOT/mobile/assets-default"
@@ -196,7 +209,7 @@ build_apk() {
   if ! has_java; then
     warn "Java не найдена (JAVA_HOME). APK на сервере не собирается."
     warn "Соберите APK локально: cd mobile && eas build -p android --profile production"
-    warn "Затем: scp orenplace.apk root@${SERVER_IP}:/var/www/orenPlace/landing/downloads/"
+    warn "Затем: scp orenplace.apk root@${SERVER_IP}:/var/www/orenPlace/landing/public/downloads/"
     return 1
   fi
 
@@ -234,7 +247,7 @@ build_apk() {
 
   mkdir -p "$(dirname "$APK_DEST")"
   cp "$ROOT/mobile/android/$apk_src" "$APK_DEST"
-  ok "APK → landing/downloads/orenplace.apk"
+  ok "APK → landing/public/downloads/orenplace.apk"
   return 0
 }
 
@@ -280,14 +293,15 @@ main() {
   patch_eas_json
 
   build_admin
+  build_landing
 
   if $SKIP_APK; then
     :
   elif [[ -f "$APK_DEST" ]] && [[ "${FORCE_APK_REBUILD:-0}" != "1" ]]; then
-    ok "APK уже есть: landing/downloads/orenplace.apk (FORCE_APK_REBUILD=1 для пересборки)"
+    ok "APK уже есть (FORCE_APK_REBUILD=1 для пересборки)"
   else
     if ! build_apk; then
-      warn "APK не собран — лендинг будет без файла до ручной загрузки в landing/downloads/"
+      warn "APK не собран — положите файл в landing/public/downloads/orenplace.apk"
     fi
   fi
 

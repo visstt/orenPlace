@@ -70,7 +70,7 @@ npx expo start
 
 ## 🌐 Деплой и лендинг
 
-- **Лендинг** — папка `landing/` (скачивание APK по кнопке)
+- **Лендинг** — `landing/` (React + Framer Motion, `npm run dev` / `npm run build`)
 - **Production Docker** — `docker-compose.prod.yml` + nginx
 - Подробная инструкция: **[DEPLOY.md](./DEPLOY.md)**
 

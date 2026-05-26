@@ -80,7 +80,7 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 **Вариант B — собрать локально и загрузить:**
 
 ```bash
-scp landing/downloads/orenplace.apk root@89.108.98.72:/var/www/orenPlace/landing/downloads/
+scp landing/public/downloads/orenplace.apk root@89.108.98.72:/var/www/orenPlace/landing/public/downloads/
 ```
 
 **Вариант C — EAS (облако):**
@@ -98,7 +98,7 @@ eas build -p android --profile production
 ```
 
 3. Скачайте `.apk` с expo.dev, переименуйте в `orenplace.apk`.
-4. Положите файл в `landing/downloads/orenplace.apk`.
+4. Положите файл в `landing/public/downloads/orenplace.apk` и пересоберите лендинг: `cd landing && npm run build`.
 
 Кнопка «Скачать APK» на лендинге отдаёт этот файл.
 
@@ -120,7 +120,7 @@ bash scripts/deploy.sh
 - генерирует секреты в `.env.production`;
 - прописывает API `http://89.108.98.72/api` в mobile;
 - собирает админку и APK;
-- копирует APK в `landing/downloads/orenplace.apk`;
+- собирает лендинг и копирует APK в `landing/public/downloads/orenplace.apk`;
 - поднимает Docker.
 
 Опции: `./scripts/deploy.sh --no-apk` (без сборки APK), `FORCE_APK_REBUILD=1 ./scripts/deploy.sh` (пересобрать APK).
@@ -187,7 +187,7 @@ npx serve landing -p 8080
 ```bash
 git pull
 cd admin && npm ci && npm run build && cd ..
-# при необходимости — новый APK в landing/downloads/
+# при необходимости — новый APK в landing/public/downloads/
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
 ```
 
@@ -197,7 +197,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 
 - [ ] Сменены секреты в `.env.production`
 - [ ] `EXPO_PUBLIC_API_URL` указывает на прод API
-- [ ] APK лежит в `landing/downloads/orenplace.apk`
+- [ ] APK лежит в `landing/public/downloads/orenplace.apk`
 - [ ] Собрана админка (`backend/admin-static`)
 - [ ] Открывается лендинг и скачивается APK
 - [ ] Приложение на телефоне подключается к API
