@@ -149,8 +149,25 @@ build_admin() {
   ok "admin → backend/admin-static"
 }
 
+sync_apk_for_landing() {
+  mkdir -p "$ROOT/landing/public/downloads"
+  if [[ -f "$APK_DEST" ]]; then
+    return 0
+  fi
+  for src in \
+    "$ROOT/landing/downloads/orenplace.apk" \
+    "$ROOT/orenplace.apk"; do
+    if [[ -f "$src" ]]; then
+      cp "$src" "$APK_DEST"
+      ok "APK скопирован в landing/public/downloads/orenplace.apk"
+      return 0
+    fi
+  done
+}
+
 build_landing() {
   log "Сборка лендинга (React + Framer Motion)"
+  sync_apk_for_landing
   cd "$ROOT/landing"
   if [[ -f package-lock.json ]]; then
     npm ci
