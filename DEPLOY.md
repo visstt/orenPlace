@@ -60,7 +60,25 @@ cd ..
 
 ## 4. APK для лендинга
 
-1. В `mobile/eas.json` замените `YOUR_DOMAIN` на ваш домен или IP.
+На VPS **без Java/Android SDK** APK на сервере не соберётся — скрипт пропустит этот шаг и поднимет Docker.
+
+**Вариант A — собрать на сервере** (нужны Java 17 + Android SDK):
+
+```bash
+apt install -y openjdk-17-jdk imagemagick
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+./scripts/deploy.sh
+```
+
+**Вариант B — собрать локально и загрузить:**
+
+```bash
+scp landing/downloads/orenplace.apk root@89.108.98.72:/var/www/orenPlace/landing/downloads/
+```
+
+**Вариант C — EAS (облако):**
+
+1. В `mobile/eas.json` уже указан `http://89.108.98.72/api`.
 2. Соберите APK:
 
 ```bash
@@ -96,6 +114,11 @@ chmod +x scripts/deploy.sh
 - поднимает Docker.
 
 Опции: `./scripts/deploy.sh --no-apk` (без сборки APK), `FORCE_APK_REBUILD=1 ./scripts/deploy.sh` (пересобрать APK).
+
+Если `docker compose` не работает, установите плагин: `apt install docker-compose-plugin`  
+или скрипт сам попробует `docker-compose`.
+
+Иконки приложения: `mobile/assets/` (в репозитории). Если пусто — `scripts/generate-mobile-assets.sh`.
 
 На Windows: `.\scripts\deploy.ps1` (нужны Docker Desktop, Java, Android SDK для APK).
 

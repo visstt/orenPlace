@@ -27,6 +27,16 @@ ok() { printf '\033[1;32m✓ %s\033[0m\n' "$1"; }
 warn() { printf '\033[1;33m⚠ %s\033[0m\n' "$1"; }
 die() { printf '\033[1;31m✗ %s\033[0m\n' "$1" >&2; exit 1; }
 
+docker_compose() {
+  if docker compose version >/dev/null 2>&1; then
+    docker compose "$@"
+  elif command -v docker-compose >/dev/null 2>&1; then
+    docker-compose "$@"
+  else
+    die "Нужен Docker Compose v2 (docker compose) или docker-compose"
+  fi
+}
+
 rand_hex() {
   if command -v openssl >/dev/null 2>&1; then
     openssl rand -hex "$1"
@@ -104,15 +114,61 @@ build_admin() {
   ok "admin → backend/admin-static"
 }
 
+ensure_mobile_assets() {
+  local assets="$ROOT/mobile/assets"
+  local defaults="$ROOT/mobile/assets-default"
+  mkdir -p "$assets"
+
+  local missing=0
+  for f in icon.png adaptive-icon.png splash.png; do
+    if [[ ! -f "$assets/$f" ]]; then
+      missing=1
+      break
+    fi
+  done
+
+  if [[ $missing -eq 0 ]]; then
+    ok "mobile/assets на месте"
+    return 0
+  fi
+
+  if [[ -d "$defaults" ]]; then
+    cp -n "$defaults"/* "$assets/" 2>/dev/null || cp "$defaults"/* "$assets/"
+    ok "Скопированы assets из mobile/assets-default/"
+    return 0
+  fi
+
+  if [[ -x "$ROOT/scripts/generate-mobile-assets.sh" ]]; then
+    "$ROOT/scripts/generate-mobile-assets.sh"
+    return 0
+  fi
+
+  die "Нет mobile/assets (icon.png, splash.png, adaptive-icon.png). Выполните git pull или scripts/generate-mobile-assets.sh"
+}
+
+has_java() {
+  command -v java >/dev/null 2>&1 && [[ -n "${JAVA_HOME:-}" || -n "$(command -v java)" ]]
+}
+
 build_apk() {
   if $SKIP_APK; then
     warn "Пропуск сборки APK (--no-apk)"
-    return
+    return 0
+  fi
+
+  ensure_mobile_assets
+
+  if ! has_java; then
+    warn "Java не найдена (JAVA_HOME). APK на сервере не собирается."
+    warn "Соберите APK локально: cd mobile && eas build -p android --profile production"
+    warn "Затем: scp orenplace.apk root@${SERVER_IP}:/var/www/orenPlace/landing/downloads/"
+    return 1
   fi
 
   log "Сборка Android APK (Expo prebuild + Gradle)"
   cd "$ROOT/mobile"
 
+  export CI=1
   export EXPO_PUBLIC_API_URL="$API_URL"
   export EXPO_PUBLIC_API_ORIGIN="$SERVER_URL"
 
@@ -122,23 +178,29 @@ build_apk() {
     npm install
   fi
 
-  npx expo prebuild --platform android --non-interactive
+  npx expo prebuild --platform android
 
   cd android
   chmod +x gradlew
 
-  if ./gradlew assembleRelease -x lint --no-daemon 2>/dev/null; then
-    APK_SRC="app/build/outputs/apk/release/app-release.apk"
+  local apk_src=""
+  if ./gradlew assembleRelease -x lint --no-daemon; then
+    apk_src="app/build/outputs/apk/release/app-release.apk"
   else
     warn "Release не собрался, пробуем debug APK"
     ./gradlew assembleDebug -x lint --no-daemon
-    APK_SRC="app/build/outputs/apk/debug/app-debug.apk"
+    apk_src="app/build/outputs/apk/debug/app-debug.apk"
   fi
 
   cd "$ROOT"
+  if [[ ! -f "$ROOT/mobile/android/$apk_src" ]]; then
+    die "APK не найден после сборки: mobile/android/$apk_src"
+  fi
+
   mkdir -p "$(dirname "$APK_DEST")"
-  cp "$ROOT/mobile/android/$APK_SRC" "$APK_DEST"
+  cp "$ROOT/mobile/android/$apk_src" "$APK_DEST"
   ok "APK → landing/downloads/orenplace.apk"
+  return 0
 }
 
 start_docker() {
@@ -153,7 +215,7 @@ start_docker() {
   fi
 
   export HTTP_PORT
-  docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+  docker_compose -f docker-compose.prod.yml --env-file .env.production up -d --build
   ok "Контейнеры запущены"
 }
 
@@ -191,10 +253,12 @@ main() {
   elif [[ -f "$APK_DEST" ]] && [[ "${FORCE_APK_REBUILD:-0}" != "1" ]]; then
     ok "APK уже есть: landing/downloads/orenplace.apk (FORCE_APK_REBUILD=1 для пересборки)"
   else
-    build_apk || warn "APK не собран (нужны Java + Android SDK). Деплой продолжается без APK."
+    if ! build_apk; then
+      warn "APK не собран — лендинг будет без файла до ручной загрузки в landing/downloads/"
+    fi
   fi
 
-  start_docker
+  start_docker || die "Docker не запустился. Попробуйте: apt install docker-compose-plugin  ИЛИ  docker-compose"
   print_summary
 }
 

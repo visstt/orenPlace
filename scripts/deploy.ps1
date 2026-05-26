@@ -137,10 +137,18 @@ function Build-Apk {
     Ok "APK → landing\downloads\orenplace.apk"
 }
 
+function Invoke-DockerCompose {
+    param([string[]]$Args)
+    docker compose @Args 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        docker-compose @Args
+    }
+}
+
 function Start-Docker {
     Log "Запуск Docker-контейнеров"
     $env:HTTP_PORT = $HTTP_PORT
-    docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+    Invoke-DockerCompose @("-f", "docker-compose.prod.yml", "--env-file", ".env.production", "up", "-d", "--build")
     Ok "Контейнеры запущены"
 }
 
