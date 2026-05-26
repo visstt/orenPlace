@@ -21,8 +21,15 @@
 
 ## 1. Подготовка сервера
 
-- Ubuntu 22.04+ (или другой Linux с Docker)
-- Установите [Docker](https://docs.docker.com/engine/install/) и Docker Compose v2
+- Ubuntu 22.04+ / Debian (VPS)
+- Docker + Compose (если ещё нет):
+
+```bash
+cd /var/www/orenPlace
+bash scripts/install-docker.sh
+```
+
+Проверка: `docker compose version` или `docker-compose version`
 
 ```bash
 git clone <ваш-репозиторий> orenplace
@@ -151,21 +158,7 @@ docker compose -f docker-compose.prod.yml exec backend npm run prisma:seed
 
 ---
 
-## 6. HTTPS (рекомендуется)
-
-На сервере с доменом удобно поставить **Caddy** или **certbot** перед nginx, либо пробросить 443 на nginx и добавить сертификаты Let's Encrypt.
-
-После HTTPS обновите в `mobile/eas.json`:
-
-```json
-"EXPO_PUBLIC_API_URL": "https://ваш-домен.ru/api"
-```
-
-и пересоберите APK.
-
----
-
-## 7. Локальная разработка (без prod)
+## 6. Локальная разработка (без prod)
 
 ```bash
 # БД
@@ -188,7 +181,7 @@ npx serve landing -p 8080
 
 ---
 
-## 8. Обновление релиза
+## 7. Обновление релиза
 
 ```bash
 git pull

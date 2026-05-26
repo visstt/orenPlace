@@ -27,14 +27,49 @@ ok() { printf '\033[1;32m✓ %s\033[0m\n' "$1"; }
 warn() { printf '\033[1;33m⚠ %s\033[0m\n' "$1"; }
 die() { printf '\033[1;31m✗ %s\033[0m\n' "$1" >&2; exit 1; }
 
-docker_compose() {
-  if docker compose version >/dev/null 2>&1; then
-    docker compose "$@"
-  elif command -v docker-compose >/dev/null 2>&1; then
-    docker-compose "$@"
-  else
-    die "Нужен Docker Compose v2 (docker compose) или docker-compose"
+COMPOSE_CMD=()
+
+detect_docker_compose() {
+  COMPOSE_CMD=()
+  if ! command -v docker >/dev/null 2>&1; then
+    return 1
   fi
+  if docker compose version >/dev/null 2>&1; then
+    COMPOSE_CMD=(docker compose)
+    return 0
+  fi
+  if command -v docker-compose >/dev/null 2>&1; then
+    COMPOSE_CMD=(docker-compose)
+    return 0
+  fi
+  return 1
+}
+
+docker_compose() {
+  if [[ ${#COMPOSE_CMD[@]} -eq 0 ]]; then
+    detect_docker_compose || docker_compose_install_hint
+  fi
+  "${COMPOSE_CMD[@]}" "$@"
+}
+
+docker_compose_install_hint() {
+  cat >&2 <<'EOF'
+
+✗ Docker Compose не установлен (команда «docker compose» недоступна).
+
+На сервере выполните ОДИН раз:
+
+  bash scripts/install-docker.sh
+
+или вручную:
+
+  apt update
+  apt install -y docker.io docker-compose-plugin
+  systemctl enable --now docker
+
+Затем снова: bash scripts/deploy.sh --no-apk
+EOF
+  exit 1
 }
 
 rand_hex() {
@@ -210,9 +245,7 @@ start_docker() {
   fi
 
   log "Запуск Docker-контейнеров"
-  if ! command -v docker >/dev/null 2>&1; then
-    die "Docker не установлен"
-  fi
+  detect_docker_compose || docker_compose_install_hint
 
   export HTTP_PORT
   docker_compose -f docker-compose.prod.yml --env-file .env.production up -d --build
