@@ -6,6 +6,7 @@ export interface User {
   phone?: string;
   city?: string;
   avatar?: string;
+  role?: string;
   createdAt: string;
 }
 
@@ -49,6 +50,7 @@ export interface AuthResponse {
     name: string;
     email: string;
     avatar?: string;
+    role?: string;
   };
   accessToken: string;
   refreshToken: string;
@@ -80,6 +82,7 @@ export type RootStackParamList = {
   Auth: undefined;
   Login: undefined;
   Register: undefined;
+  Admin: undefined;
   EventDetail: { eventId: string };
   PurchaseTicket: { eventId: string };
   EditProfile: undefined;

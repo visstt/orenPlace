@@ -16,6 +16,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:create-test-admin": "ts-node prisma/create-test-admin.ts",
     "prisma:studio": "prisma studio"
   },
   "dependencies": {

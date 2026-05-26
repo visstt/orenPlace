@@ -1,0 +1,21 @@
+# Env и секреты
+.env
+.env.production
+backend/.env
+
+# Зависимости и сборки
+node_modules/
+**/dist/
+backend/admin-static/
+
+# Загрузки и APK (положите APK на сервер вручную)
+backend/uploads/*
+!backend/uploads/.gitkeep
+landing/downloads/*.apk
+
+# IDE и ОС
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db

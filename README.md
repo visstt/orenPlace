@@ -68,6 +68,24 @@ npx expo start
 
 ---
 
+## 🌐 Деплой и лендинг
+
+- **Лендинг** — папка `landing/` (скачивание APK по кнопке)
+- **Production Docker** — `docker-compose.prod.yml` + nginx
+- Подробная инструкция: **[DEPLOY.md](./DEPLOY.md)**
+
+Быстрый старт prod:
+
+```bash
+cp .env.production.example .env.production
+# отредактируйте секреты
+cd admin && npm ci && npm run build && cd ..
+# положите APK: landing/downloads/orenplace.apk
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+```
+
+---
+
 ## 📂 Структура проекта
 
 ```
@@ -99,7 +117,11 @@ OrenPlace/
 │   │   └── utils/              # Константы, утилиты
 │   ├── App.tsx
 │   └── package.json
-├── docker-compose.yml
+├── landing/                    # Лендинг + APK для скачивания
+├── nginx/                      # Конфиг nginx для prod
+├── docker-compose.yml          # Dev: postgres + backend
+├── docker-compose.prod.yml     # Prod: postgres + backend + nginx
+├── DEPLOY.md
 └── README.md
 ```
 

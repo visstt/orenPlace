@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -36,13 +37,14 @@ export class AuthService {
       },
     });
 
-    const tokens = await this.generateTokens(user.id, user.email);
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
 
     return {
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
       ...tokens,
     };
@@ -63,7 +65,7 @@ export class AuthService {
       throw new UnauthorizedException('Неверный email или пароль');
     }
 
-    const tokens = await this.generateTokens(user.id, user.email);
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
 
     return {
       user: {
@@ -71,6 +73,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        role: user.role,
       },
       ...tokens,
     };
@@ -90,14 +93,18 @@ export class AuthService {
         throw new UnauthorizedException('Пользователь не найден');
       }
 
-      return this.generateTokens(user.id, user.email);
+      return this.generateTokens(user.id, user.email, user.role);
     } catch {
       throw new UnauthorizedException('Невалидный refresh token');
     }
   }
 
-  private async generateTokens(userId: string, email: string) {
-    const payload = { sub: userId, email };
+  private async generateTokens(
+    userId: string,
+    email: string,
+    role: UserRole,
+  ) {
+    const payload = { sub: userId, email, role };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {

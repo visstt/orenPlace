@@ -1,0 +1,159 @@
+# Деплой OrenPlace
+
+Инструкция для выкладки на VPS (Linux) с Docker: **лендинг**, **API**, **PostgreSQL**, **админка**.
+
+## Что поднимается
+
+| Сервис   | Назначение                          |
+|----------|-------------------------------------|
+| nginx    | Лендинг (`/`), прокси API (`/api`)  |
+| backend  | NestJS API + админка (`/admin`)     |
+| postgres | База данных                         |
+
+После деплоя:
+- Сайт: `http://ВАШ_IP/`
+- API: `http://ВАШ_IP/api`
+- Swagger: `http://ВАШ_IP/api/docs`
+- Админка: `http://ВАШ_IP/admin/`
+- Скачивание APK: `http://ВАШ_IP/downloads/orenplace.apk`
+
+---
+
+## 1. Подготовка сервера
+
+- Ubuntu 22.04+ (или другой Linux с Docker)
+- Установите [Docker](https://docs.docker.com/engine/install/) и Docker Compose v2
+
+```bash
+git clone <ваш-репозиторий> orenplace
+cd orenplace
+```
+
+---
+
+## 2. Переменные окружения
+
+```bash
+cp .env.production.example .env.production
+```
+
+Отредактируйте `.env.production`:
+- `POSTGRES_PASSWORD` — надёжный пароль
+- `JWT_SECRET` и `JWT_REFRESH_SECRET` — длинные случайные строки (не оставляйте dev-значения)
+
+---
+
+## 3. Сборка админ-панели
+
+Перед Docker-сборкой backend нужен собранный фронт админки:
+
+```bash
+cd admin
+npm ci
+npm run build
+cd ..
+```
+
+Папка `backend/admin-static` появится автоматически (см. `admin/vite.config.ts`).
+
+---
+
+## 4. APK для лендинга
+
+1. В `mobile/eas.json` замените `YOUR_DOMAIN` на ваш домен или IP.
+2. Соберите APK:
+
+```bash
+cd mobile
+npm install -g eas-cli
+eas login
+eas init
+eas build -p android --profile production
+```
+
+3. Скачайте `.apk` с expo.dev, переименуйте в `orenplace.apk`.
+4. Положите файл в `landing/downloads/orenplace.apk`.
+
+Кнопка «Скачать APK» на лендинге отдаёт этот файл.
+
+---
+
+## 5. Запуск в production
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+```
+
+Проверка:
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+curl -s http://localhost/api/categories | head
+```
+
+При первом запуске Prisma применит миграции (`prisma migrate deploy` в Dockerfile).
+
+Опционально — тестовые данные (только на чистой БД):
+
+```bash
+docker compose -f docker-compose.prod.yml exec backend npm run prisma:seed
+```
+
+---
+
+## 6. HTTPS (рекомендуется)
+
+На сервере с доменом удобно поставить **Caddy** или **certbot** перед nginx, либо пробросить 443 на nginx и добавить сертификаты Let's Encrypt.
+
+После HTTPS обновите в `mobile/eas.json`:
+
+```json
+"EXPO_PUBLIC_API_URL": "https://ваш-домен.ru/api"
+```
+
+и пересоберите APK.
+
+---
+
+## 7. Локальная разработка (без prod)
+
+```bash
+# БД
+docker compose up -d postgres
+
+# Backend
+cd backend && cp .env.example .env && npm install
+npx prisma migrate dev
+npm run start:dev
+
+# Mobile
+cd mobile && npx expo start
+```
+
+Лендинг локально: откройте `landing/index.html` в браузере или:
+
+```bash
+npx serve landing -p 8080
+```
+
+---
+
+## 8. Обновление релиза
+
+```bash
+git pull
+cd admin && npm ci && npm run build && cd ..
+# при необходимости — новый APK в landing/downloads/
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+```
+
+---
+
+## Чеклист перед публикацией
+
+- [ ] Сменены секреты в `.env.production`
+- [ ] `EXPO_PUBLIC_API_URL` указывает на прод API
+- [ ] APK лежит в `landing/downloads/orenplace.apk`
+- [ ] Собрана админка (`backend/admin-static`)
+- [ ] Открывается лендинг и скачивается APK
+- [ ] Приложение на телефоне подключается к API

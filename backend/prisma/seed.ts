@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -42,6 +42,16 @@ async function main() {
       phone: '+7 (912) 345-67-89',
       city: 'Оренбург',
       password: hashedPassword,
+    },
+  });
+
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  const admin = await prisma.user.create({
+    data: {
+      name: 'Администратор',
+      email: 'admin@orenplace.ru',
+      password: adminPassword,
+      role: UserRole.ADMIN,
     },
   });
 
@@ -181,6 +191,7 @@ async function main() {
   console.log(`📂 Создано категорий: ${categories.length}`);
   console.log(`📅 Создано событий: ${events.length}`);
   console.log(`👤 Создан пользователь: ${user.email}`);
+  console.log(`🛡 Админ-панель: ${admin.email} / admin123`);
 }
 
 main()

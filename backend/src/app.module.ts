@@ -7,6 +7,7 @@ import { EventsModule } from './events/events.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { AdminModule } from './admin/admin.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -17,6 +18,11 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'admin-static'),
+      serveRoot: '/admin',
+      exclude: ['/api/(.*)'],
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -24,6 +30,7 @@ import { join } from 'path';
     CategoriesModule,
     TicketsModule,
     FavoritesModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

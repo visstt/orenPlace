@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export const COLORS = {
   primary: '#8E2DE2',
   primaryDark: '#4A00E0',
@@ -51,12 +53,28 @@ export const SHADOWS = {
   },
 };
 
-import { Platform } from 'react-native';
+const rawWebOrigin =
+  (typeof process !== 'undefined' && process.env.EXPO_PUBLIC_API_ORIGIN) ||
+  'http://localhost:3000';
 
-// Определяем URL в зависимости от платформы
-export const API_URL = 
-  Platform.OS === 'android' 
-    ? 'http://10.0.2.2:3000/api'  // Android emulator
+/** Хост Nest API (без /api). Для веба и редиректа на админку. */
+export const WEB_API_ORIGIN = rawWebOrigin.replace(/\/$/, '');
+
+const envApiUrl =
+  typeof process !== 'undefined' && process.env.EXPO_PUBLIC_API_URL
+    ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+    : null;
+
+function normalizeApiUrl(base: string): string {
+  return base.endsWith('/api') ? base : `${base}/api`;
+}
+
+const devApiUrl =
+  Platform.OS === 'android'
+    ? 'http://10.0.2.2:3000/api'
     : Platform.OS === 'ios'
-    ? 'http://localhost:3000/api' // iOS simulator
-    : 'http://localhost:3000/api'; // Web/other
+      ? 'http://localhost:3000/api'
+      : normalizeApiUrl(WEB_API_ORIGIN);
+
+/** Базовый URL API. В прод-сборке задайте EXPO_PUBLIC_API_URL (например https://example.com/api). */
+export const API_URL = envApiUrl ? normalizeApiUrl(envApiUrl) : devApiUrl;

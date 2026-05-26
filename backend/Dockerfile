@@ -9,9 +9,10 @@ RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
+# Локальный prisma без npx — иначе npx тянет registry.npmjs.org и падает при EAI_AGAIN/DNS
+RUN ./node_modules/.bin/prisma generate
 RUN npm run build
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && npm run start:prod"]

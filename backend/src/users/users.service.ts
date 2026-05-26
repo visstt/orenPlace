@@ -17,6 +17,7 @@ export class UsersService {
         phone: true,
         city: true,
         avatar: true,
+        role: true,
         createdAt: true,
       },
     });

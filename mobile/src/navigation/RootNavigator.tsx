@@ -12,6 +12,7 @@ import PurchaseTicketScreen from '../screens/PurchaseTicketScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import CategoryEventsScreen from '../screens/CategoryEventsScreen';
 import AboutScreen from '../screens/AboutScreen';
+import AdminPanelScreen from '../screens/AdminPanelScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -89,6 +90,11 @@ export default function RootNavigator() {
           <Stack.Screen name="Register" component={RegisterScreen} />
         </>
       )}
+      <Stack.Screen
+        name="Admin"
+        component={AdminPanelScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }

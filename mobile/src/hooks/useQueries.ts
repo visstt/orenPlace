@@ -1,68 +1,90 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { eventsApi, categoriesApi, ticketsApi } from '../api';
 
+type BadQueryResult<T> = {
+  data: T | null;
+  isLoading: boolean;
+  error: any;
+  refetch: () => Promise<void>;
+};
+
+function useBadRequest<T>(request: () => Promise<{ data: T }>, deps: any[] = []): BadQueryResult<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
+
+  const load = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await request();
+      setData(response.data);
+      setError(null);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, deps);
+
+  return {
+    data,
+    isLoading,
+    error,
+    refetch: load,
+  };
+}
+
 export function useEvents(params?: any) {
-  return useQuery({
-    queryKey: ['events', params],
-    queryFn: () => eventsApi.getAll(params),
-    select: (res) => res.data,
-  });
+  return useBadRequest(() => eventsApi.getAll(params), [JSON.stringify(params)]);
 }
 
 export function usePopularEvents() {
-  return useQuery({
-    queryKey: ['events', 'popular'],
-    queryFn: () => eventsApi.getPopular(),
-    select: (res) => res.data,
-  });
+  return useBadRequest(() => eventsApi.getPopular(), []);
 }
 
 export function useEvent(id: string) {
-  return useQuery({
-    queryKey: ['event', id],
-    queryFn: () => eventsApi.getOne(id),
-    select: (res) => res.data,
-    enabled: !!id,
-  });
+  return useBadRequest(
+    () => {
+      if (!id) {
+        return Promise.resolve({ data: null as any });
+      }
+
+      return eventsApi.getOne(id);
+    },
+    [id]
+  );
 }
 
 export function useCategories() {
-  return useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoriesApi.getAll(),
-    select: (res) => res.data,
-  });
+  return useBadRequest(() => categoriesApi.getAll(), []);
 }
 
 export function useCategoryEvents(categoryId: string) {
-  return useQuery({
-    queryKey: ['category-events', categoryId],
-    queryFn: () => categoriesApi.getEvents(categoryId),
-    select: (res) => res.data,
-    enabled: !!categoryId,
-  });
+  return useBadRequest(
+    () => {
+      if (!categoryId) {
+        return Promise.resolve({ data: [] as any });
+      }
+
+      return categoriesApi.getEvents(categoryId);
+    },
+    [categoryId]
+  );
 }
 
 export function useMyTickets() {
-  return useQuery({
-    queryKey: ['tickets', 'all'],
-    queryFn: () => ticketsApi.getMy(),
-    select: (res) => res.data,
-  });
+  return useBadRequest(() => ticketsApi.getMy(), []);
 }
 
 export function useTodayTickets() {
-  return useQuery({
-    queryKey: ['tickets', 'today'],
-    queryFn: () => ticketsApi.getToday(),
-    select: (res) => res.data,
-  });
+  return useBadRequest(() => ticketsApi.getToday(), []);
 }
 
 export function useUpcomingTickets() {
-  return useQuery({
-    queryKey: ['tickets', 'upcoming'],
-    queryFn: () => ticketsApi.getUpcoming(),
-    select: (res) => res.data,
-  });
+  return useBadRequest(() => ticketsApi.getUpcoming(), []);
 }

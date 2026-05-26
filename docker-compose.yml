@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -15,6 +13,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - orenplace-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d orenplace']
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
 
   backend:
     build:
@@ -32,7 +36,8 @@ services:
     ports:
       - '3000:3000'
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./backend/uploads:/app/uploads
     networks:

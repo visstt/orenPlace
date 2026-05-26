@@ -12,6 +12,7 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto, EventQueryDto } from './dto/event.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Мероприятия')
@@ -45,7 +46,7 @@ export class EventsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Создать мероприятие' })
   create(@Body() dto: CreateEventDto) {
@@ -53,7 +54,7 @@ export class EventsController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Обновить мероприятие' })
   update(@Param('id') id: string, @Body() dto: UpdateEventDto) {
@@ -61,7 +62,7 @@ export class EventsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Удалить мероприятие' })
   remove(@Param('id') id: string) {

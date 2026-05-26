@@ -23,7 +23,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#8E2DE2"
       },
-      "package": "ru.orenplace.app"
+      "package": "ru.orenplace.app",
+      "versionCode": 1
     },
     "plugins": [
       "expo-font"
