@@ -16,6 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { COLORS, SIZES } from '../utils/constants';
+import { getApiErrorMessage } from '../utils/apiError';
 import { useAuthStore } from '../store/authStore';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -36,11 +37,8 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
-    } catch (error: any) {
-      Alert.alert(
-        'Ошибка',
-        error.response?.data?.message || 'Не удалось войти',
-      );
+    } catch (error: unknown) {
+      Alert.alert('Ошибка', getApiErrorMessage(error));
     } finally {
       setLoading(false);
     }

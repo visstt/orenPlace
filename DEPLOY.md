@@ -151,11 +151,17 @@ curl -s http://localhost/api/categories | head
 
 При первом запуске Prisma применит миграции (`prisma migrate deploy` в Dockerfile).
 
-Опционально — тестовые данные (только на чистой БД):
+Тестовые данные и афиша на лето (июнь–сентябрь 2026):
 
 ```bash
 docker compose -f docker-compose.prod.yml exec backend npm run prisma:seed
 ```
+
+Пересоздаёт категории, ~30 событий и тестовых пользователей.
+
+Проверка API с телефона/ПК: http://89.108.98.72/api/health
+
+Тестовый вход: `test@orenplace.ru` / `password123`
 
 ---
 

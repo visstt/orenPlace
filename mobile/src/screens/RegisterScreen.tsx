@@ -17,6 +17,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { COLORS, SIZES } from '../utils/constants';
+import { getApiErrorMessage } from '../utils/apiError';
 import { useAuthStore } from '../store/authStore';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -49,11 +50,8 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await register(name, email, password);
-    } catch (error: any) {
-      Alert.alert(
-        'Ошибка',
-        error.response?.data?.message || 'Не удалось зарегистрироваться',
-      );
+    } catch (error: unknown) {
+      Alert.alert('Ошибка', getApiErrorMessage(error));
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Куда сходить в Оренбурге",
     "slug": "orenplace",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -24,6 +24,7 @@
         "backgroundColor": "#8E2DE2"
       },
       "package": "ru.orenplace.app",
+      "versionCode": 2,
       "usesCleartextTraffic": true
     },
     "plugins": [
@@ -34,7 +35,8 @@
           "android": {
             "compileSdkVersion": 34,
             "targetSdkVersion": 34,
-            "buildToolsVersion": "34.0.0"
+            "buildToolsVersion": "34.0.0",
+            "usesCleartextTraffic": true
           }
         }
       ]

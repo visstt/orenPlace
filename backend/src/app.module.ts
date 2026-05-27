@@ -8,6 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { AdminModule } from './admin/admin.module';
+import { HealthController } from './health.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -32,5 +33,6 @@ import { join } from 'path';
     FavoritesModule,
     AdminModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
