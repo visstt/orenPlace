@@ -302,7 +302,7 @@ start_docker() {
   if ! docker_compose -f docker-compose.prod.yml --env-file .env.production up -d --build --remove-orphans; then
     die "Docker Compose завершился с ошибкой. Попробуйте:
   docker rm -f orenplace-nginx
-  apt install -y docker-compose-plugin
+  bash scripts/install-compose-v2.sh
   bash scripts/deploy.sh --no-apk"
   fi
 
