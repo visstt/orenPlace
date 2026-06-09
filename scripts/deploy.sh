@@ -9,7 +9,11 @@ cd "$ROOT"
 # shellcheck source=/dev/null
 source "$ROOT/scripts/deploy.config"
 
-SERVER_URL="http://${SERVER_IP}"
+if [[ "${HTTP_PORT}" == "80" ]]; then
+  SERVER_URL="http://${SERVER_IP}"
+else
+  SERVER_URL="http://${SERVER_IP}:${HTTP_PORT}"
+fi
 API_URL="${SERVER_URL}/api"
 APK_DEST="$ROOT/landing/public/downloads/orenplace.apk"
 

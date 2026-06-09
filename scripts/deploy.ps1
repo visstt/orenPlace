@@ -11,8 +11,8 @@ Set-Location $Root
 
 # deploy.config: SERVER_IP=...
 $configPath = Join-Path $Root "scripts\deploy.config"
-$SERVER_IP = "89.108.98.72"
-$HTTP_PORT = "80"
+$SERVER_IP = "95.105.109.38"
+$HTTP_PORT = "29"
 if (Test-Path $configPath) {
     Get-Content $configPath | ForEach-Object {
         if ($_ -match '^\s*SERVER_IP=(.+)$') { $SERVER_IP = $Matches[1].Trim() }
@@ -20,7 +20,7 @@ if (Test-Path $configPath) {
     }
 }
 
-$SERVER_URL = "http://$SERVER_IP"
+$SERVER_URL = if ($HTTP_PORT -eq "80") { "http://$SERVER_IP" } else { "http://${SERVER_IP}:${HTTP_PORT}" }
 $API_URL = "$SERVER_URL/api"
 $ApkDest = Join-Path $Root "landing\downloads\orenplace.apk"
 

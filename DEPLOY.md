@@ -80,12 +80,12 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 **Вариант B — собрать локально и загрузить:**
 
 ```bash
-scp landing/public/downloads/orenplace.apk root@89.108.98.72:/var/www/orenPlace/landing/public/downloads/
+scp landing/public/downloads/orenplace.apk root@95.105.109.38:/var/www/orenPlace/landing/public/downloads/
 ```
 
 **Вариант C — EAS (облако):**
 
-1. В `mobile/eas.json` уже указан `http://89.108.98.72/api`.
+1. В `mobile/eas.json` уже указан `http://95.105.109.38/api`.
 2. **Важно:** `mobile/node_modules` не должен быть в git (иначе Gradle на EAS падает). После `git pull` выполните `cd mobile && npm ci`.
 3. Соберите APK:
 
@@ -118,7 +118,7 @@ bash scripts/deploy.sh
 Скрипт:
 - копирует `.env` из примеров (если файлов ещё нет);
 - генерирует секреты в `.env.production`;
-- прописывает API `http://89.108.98.72/api` в mobile;
+- прописывает API `http://95.105.109.38/api` в mobile;
 - собирает админку и APK;
 - собирает лендинг и копирует APK в `landing/public/downloads/orenplace.apk`;
 - поднимает Docker.
@@ -159,7 +159,7 @@ docker compose -f docker-compose.prod.yml exec backend npm run prisma:seed
 
 Пересоздаёт категории, ~30 событий и тестовых пользователей.
 
-Проверка API с телефона/ПК: http://89.108.98.72/api/health
+Проверка API с телефона/ПК: http://95.105.109.38/api/health
 
 Тестовый вход: `test@orenplace.ru` / `password123`
 

@@ -11,12 +11,17 @@
         "image": "latest"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://89.108.98.72/api"
+        "EXPO_PUBLIC_API_URL": "http://95.105.109.38:29/api",
+        "EXPO_PUBLIC_API_ORIGIN": "http://95.105.109.38:29"
       }
     },
     "preview": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://95.105.109.38:29/api",
+        "EXPO_PUBLIC_API_ORIGIN": "http://95.105.109.38:29"
       }
     }
   }

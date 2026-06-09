@@ -81,7 +81,7 @@ bash scripts/deploy.sh
 # или: chmod +x scripts/deploy.sh && ./scripts/deploy.sh
 ```
 
-IP сервера: `89.108.98.72` (меняется в `scripts/deploy.config`).
+IP сервера: `95.105.109.38` (меняется в `scripts/deploy.config`).
 
 ---
 
