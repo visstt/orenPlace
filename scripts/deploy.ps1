@@ -148,10 +148,10 @@ function Invoke-DockerCompose {
 function Start-Docker {
     Log "Запуск Docker-контейнеров"
     $env:HTTP_PORT = $HTTP_PORT
-    $nginx = docker ps -a --format "{{.Names}}" 2>$null | Where-Object { $_ -eq "orenplace-nginx" }
+    $nginx = docker ps -a --format "{{.Names}}" 2>$null | Where-Object { $_ -match "orenplace-nginx" }
     if ($nginx) {
-        Warn "Удаляем старый контейнер orenplace-nginx"
-        docker rm -f orenplace-nginx 2>$null | Out-Null
+        Warn "Удаляем старые контейнеры nginx"
+        $nginx | ForEach-Object { docker rm -f $_ 2>$null | Out-Null }
     }
     if (-not (Invoke-DockerCompose @("-f", "docker-compose.prod.yml", "--env-file", ".env.production", "up", "-d", "--build", "--remove-orphans"))) {
         throw "Docker Compose завершился с ошибкой"

@@ -60,11 +60,15 @@ using_legacy_compose() {
   [[ ${#COMPOSE_CMD[@]} -gt 0 && "${COMPOSE_CMD[0]}" == "docker-compose" ]]
 }
 
-# docker-compose 1.29 + новый Docker Engine → KeyError: 'ContainerConfig' при recreate nginx
-fix_stale_nginx_container() {
-  if docker ps -a --format '{{.Names}}' | grep -qx 'orenplace-nginx'; then
-    warn "Удаляем старый контейнер orenplace-nginx (обход бага legacy docker-compose)"
-    docker rm -f orenplace-nginx >/dev/null 2>&1 || true
+# После legacy docker-compose остаются контейнеры вида cd8a57beb2f9_orenplace-nginx
+cleanup_stale_nginx_containers() {
+  local stale
+  stale="$(docker ps -a --format '{{.Names}}' | grep 'orenplace-nginx' || true)"
+  if [[ -n "$stale" ]]; then
+    warn "Удаляем старые контейнеры nginx"
+    while IFS= read -r name; do
+      [[ -n "$name" ]] && docker rm -f "$name" >/dev/null 2>&1 || true
+    done <<< "$stale"
   fi
 }
 
@@ -294,16 +298,18 @@ start_docker() {
   detect_docker_compose || docker_compose_install_hint
 
   if using_legacy_compose; then
-    warn "Используется устаревший docker-compose — рекомендуется: apt install -y docker-compose-plugin"
-    fix_stale_nginx_container
+    warn "Используется устаревший docker-compose — установите v2: bash scripts/install-compose-v2.sh"
   fi
+
+  cleanup_stale_nginx_containers
 
   export HTTP_PORT
   if ! docker_compose -f docker-compose.prod.yml --env-file .env.production up -d --build --remove-orphans; then
     die "Docker Compose завершился с ошибкой. Попробуйте:
-  docker rm -f orenplace-nginx
-  bash scripts/install-compose-v2.sh
-  bash scripts/deploy.sh --no-apk"
+  docker ps -a --filter name=orenplace-nginx
+  docker rm -f \$(docker ps -a --filter name=orenplace-nginx -q)
+  export HTTP_PORT=29
+  docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build"
   fi
 
   if ! docker ps --format '{{.Names}}' | grep -qx 'orenplace-nginx'; then
