@@ -140,15 +140,24 @@ function Build-Apk {
 function Invoke-DockerCompose {
     param([string[]]$Args)
     docker compose @Args 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        docker-compose @Args
-    }
+    if ($LASTEXITCODE -eq 0) { return $true }
+    docker-compose @Args
+    return $LASTEXITCODE -eq 0
 }
 
 function Start-Docker {
     Log "Запуск Docker-контейнеров"
     $env:HTTP_PORT = $HTTP_PORT
-    Invoke-DockerCompose @("-f", "docker-compose.prod.yml", "--env-file", ".env.production", "up", "-d", "--build")
+    $nginx = docker ps -a --format "{{.Names}}" 2>$null | Where-Object { $_ -eq "orenplace-nginx" }
+    if ($nginx) {
+        Warn "Удаляем старый контейнер orenplace-nginx"
+        docker rm -f orenplace-nginx 2>$null | Out-Null
+    }
+    if (-not (Invoke-DockerCompose @("-f", "docker-compose.prod.yml", "--env-file", ".env.production", "up", "-d", "--build", "--remove-orphans"))) {
+        throw "Docker Compose завершился с ошибкой"
+    }
+    $running = docker ps --format "{{.Names}}" 2>$null | Where-Object { $_ -eq "orenplace-nginx" }
+    if (-not $running) { throw "Контейнер orenplace-nginx не запущен" }
     Ok "Контейнеры запущены"
 }
 
