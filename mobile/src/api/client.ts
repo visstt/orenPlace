@@ -46,7 +46,8 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch {
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+        const { useAuthStore } = await import('../store/authStore');
+        await useAuthStore.getState().logout();
       }
     }
 

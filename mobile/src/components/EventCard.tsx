@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { COLORS, SIZES, SHADOWS } from '../../utils/constants';
+import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../../utils/constants';
 import { Event } from '../../types';
 
 const { width } = Dimensions.get('window');
@@ -49,7 +49,7 @@ export default function EventCard({
       >
         <Image
           source={{
-            uri: event.images?.[0] || 'https://placehold.co/200x200/8E2DE2/white?text=Event',
+            uri: event.images?.[0] || EVENT_IMAGE_FALLBACK,
           }}
           style={styles.compactImage}
         />
@@ -72,7 +72,7 @@ export default function EventCard({
     >
       <Image
         source={{
-          uri: event.images?.[0] || 'https://placehold.co/400x200/8E2DE2/white?text=Event',
+          uri: event.images?.[0] || EVENT_IMAGE_FALLBACK,
         }}
         style={styles.image}
       />

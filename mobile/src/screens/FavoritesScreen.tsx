@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
 import { favoritesApi } from '../api';
 import { Event, RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -47,7 +47,7 @@ export default function FavoritesScreen() {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.images?.[0] || 'https://placehold.co/400x200/8E2DE2/white?text=Event' }}
+        source={{ uri: item.images?.[0] || EVENT_IMAGE_FALLBACK }}
         style={styles.eventImage}
       />
       <View style={styles.eventContent}>

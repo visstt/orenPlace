@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
 import { eventsApi, ticketsApi } from '../api';
 import { RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -70,7 +70,7 @@ export default function EventDetailScreen() {
         <View style={styles.imageContainer}>
           <Image
             source={{
-              uri: event.images[0] || 'https://placehold.co/800x400/8E2DE2/white?text=Event',
+              uri: event.images[0] || EVENT_IMAGE_FALLBACK,
             }}
             style={styles.image}
           />

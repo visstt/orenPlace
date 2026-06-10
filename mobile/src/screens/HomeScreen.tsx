@@ -16,7 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
 import { eventsApi, categoriesApi } from '../api';
 import { Event, Category, RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -114,7 +114,7 @@ export default function HomeScreen() {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.images[0] || 'https://placehold.co/300x200/8E2DE2/white?text=Event' }}
+        source={{ uri: item.images[0] || EVENT_IMAGE_FALLBACK }}
         style={styles.popularImage}
       />
       <LinearGradient
@@ -136,7 +136,7 @@ export default function HomeScreen() {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.images[0] || 'https://placehold.co/400x200/8E2DE2/white?text=Event' }}
+        source={{ uri: item.images[0] || EVENT_IMAGE_FALLBACK }}
         style={styles.eventImage}
       />
       <View style={styles.eventContent}>

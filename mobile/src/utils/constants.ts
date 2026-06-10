@@ -78,3 +78,6 @@ const devApiUrl =
 
 /** Базовый URL API. В прод-сборке задайте EXPO_PUBLIC_API_URL (например https://example.com/api). */
 export const API_URL = envApiUrl ? normalizeApiUrl(envApiUrl) : devApiUrl;
+
+/** Заглушка, если у события нет фото */
+export const EVENT_IMAGE_FALLBACK = 'https://picsum.photos/seed/orenplace-event/800/400';

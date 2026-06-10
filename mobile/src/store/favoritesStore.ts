@@ -1,6 +1,9 @@
+import { Alert } from 'react-native';
+import axios from 'axios';
 import { create } from 'zustand';
 import { Event } from '../types';
 import { favoritesApi } from '../api/favorites';
+import { getApiErrorMessage } from '../utils/apiError';
 
 interface FavoritesState {
   favorites: Event[];
@@ -50,7 +53,11 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
         get().loadFavorites();
       }
     } catch (error) {
-      console.error('Toggle favorite error:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        Alert.alert('Сессия истекла', 'Войдите в аккаунт снова');
+      } else {
+        Alert.alert('Ошибка', getApiErrorMessage(error));
+      }
     }
   },
 

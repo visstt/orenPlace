@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
 import { categoriesApi } from '../api';
 import { Event, RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -57,7 +57,7 @@ export default function CategoryEventsScreen() {
     >
       <Image
         source={{
-          uri: item.images?.[0] || 'https://placehold.co/400x200/8E2DE2/white?text=Event',
+          uri: item.images?.[0] || EVENT_IMAGE_FALLBACK,
         }}
         style={styles.eventImage}
       />

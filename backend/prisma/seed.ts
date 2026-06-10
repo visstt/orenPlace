@@ -31,8 +31,9 @@ function summerDate(month: number, day: number): Date {
   return new Date(Date.UTC(2026, month - 1, day, 12, 0, 0));
 }
 
-function img(text: string, color = '8E2DE2') {
-  return [`https://placehold.co/800x400/${color}/white?text=${encodeURIComponent(text)}`];
+function img(text: string) {
+  const seed = encodeURIComponent(text.replace(/\s+/g, '-').toLowerCase());
+  return [`https://picsum.photos/seed/orenplace-${seed}/800/400`];
 }
 
 async function main() {
