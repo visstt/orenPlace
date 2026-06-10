@@ -80,4 +80,5 @@ const devApiUrl =
 export const API_URL = envApiUrl ? normalizeApiUrl(envApiUrl) : devApiUrl;
 
 /** Заглушка, если у события нет фото */
-export const EVENT_IMAGE_FALLBACK = 'https://picsum.photos/seed/orenplace-event/800/400';
+export const EVENT_IMAGE_FALLBACK =
+  'https://avatars.mds.yandex.net/get-afishanew/29022/4c4d033051e7209e94cebaa9103cc298/600x600';

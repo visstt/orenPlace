@@ -31,9 +31,60 @@ function summerDate(month: number, day: number): Date {
   return new Date(Date.UTC(2026, month - 1, day, 12, 0, 0));
 }
 
-function img(text: string) {
-  const seed = encodeURIComponent(text.replace(/\s+/g, '-').toLowerCase());
-  return [`https://picsum.photos/seed/orenplace-${seed}/800/400`];
+/** Фото с CDN Яндекс.Афиши (avatars.mds.yandex.net) */
+const yandexImages: Record<CategoryKey, string[]> = {
+  concerts: [
+    'https://avatars.mds.yandex.net/get-afishanew/29022/4c4d033051e7209e94cebaa9103cc298/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/5109582/ab306a075ef97de9ef4e008f21a3ae47/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/4395007/fad2d0ff6defd2edffee9016a4fa138f/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/34116/f137926505c8921cffb2e7e7421bbfbe/600x600',
+  ],
+  theater: [
+    'https://avatars.mds.yandex.net/get-afishanew/35821/0d264289fa6e9548dbfaf41829846887/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/4487581/07af57418e1845cab81f4ecec5cc6cb3/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/31447/ad3610ce992f4942823470a1b9669c86/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/21422/e1dbe303c5cff5c78f4efa55a2ffeee5/600x600',
+  ],
+  exhibitions: [
+    'https://avatars.mds.yandex.net/get-afishanew/5098259/12e5b0a2308f0cf8c6c7a77392709b64/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/5098259/f9697c3c146104c243762d79f6ff5ae2/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/36842/56fa9fc3f7c215ec874b38e1efbe5ec4/600x600',
+  ],
+  sport: [
+    'https://avatars.mds.yandex.net/get-afishanew/5109582/a6484e20128e90ac8b9f4a5323612dc3/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/23222/d9312603627ef8cd84e15c1ee54474a8/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/23222/80f54b708870dcaa8c499c7db40ae458/600x600',
+  ],
+  cinema: [
+    'https://avatars.mds.yandex.net/get-afishanew/21422/2e56b4898558973dc375d941c1583272/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/21422/c67eb58d894429526871d5c9cbd7f00d/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/4395007/189903184ee744ee731612c8bded7633/600x600',
+  ],
+  festivals: [
+    'https://avatars.mds.yandex.net/get-afishanew/29022/4c4d033051e7209e94cebaa9103cc298/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/35821/0d264289fa6e9548dbfaf41829846887/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/4487581/07af57418e1845cab81f4ecec5cc6cb3/600x600',
+  ],
+  workshops: [
+    'https://avatars.mds.yandex.net/get-afishanew/5098259/14a95af3d713a6790015ca4e7a24d971/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/31447/3783cbd510b4e35275363250fa09784a/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/36842/56fa9fc3f7c215ec874b38e1efbe5ec4/600x600',
+  ],
+  kids: [
+    'https://avatars.mds.yandex.net/get-afishanew/34116/f137926505c8921cffb2e7e7421bbfbe/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/4395007/fad2d0ff6defd2edffee9016a4fa138f/600x600',
+    'https://avatars.mds.yandex.net/get-afishanew/23222/80f54b708870dcaa8c499c7db40ae458/600x600',
+  ],
+};
+
+function pickImage(category: CategoryKey, title: string): string[] {
+  const pool = yandexImages[category];
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = (hash + title.charCodeAt(i)) | 0;
+  }
+  const idx = Math.abs(hash) % pool.length;
+  return [pool[idx]];
 }
 
 async function main() {
@@ -87,7 +138,6 @@ async function main() {
     price: number;
     address: string;
     isPopular: boolean;
-    images: string[];
     category: CategoryKey;
   }> = [
     // Июнь 2026
@@ -100,7 +150,6 @@ async function main() {
       price: 0,
       address: 'Набережная р. Урал',
       isPopular: true,
-      images: img('Лето+2026', 'DDA0DD'),
       category: 'festivals',
     },
     {
@@ -111,7 +160,6 @@ async function main() {
       price: 3200,
       address: 'Стадион «Газовик», ул. Терешковой, 10',
       isPopular: true,
-      images: img('Любэ', 'FF6B6B'),
       category: 'concerts',
     },
     {
@@ -122,7 +170,6 @@ async function main() {
       price: 1200,
       address: 'Оренбургский театр оперы и балета, пр. Победы, 1',
       isPopular: true,
-      images: img('Онегин', '4ECDC4'),
       category: 'theater',
     },
     {
@@ -133,7 +180,6 @@ async function main() {
       price: 350,
       address: 'Музей изобразительных искусств, ул. Каширина, 29',
       isPopular: false,
-      images: img('Платок', '45B7D1'),
       category: 'exhibitions',
     },
     {
@@ -144,7 +190,6 @@ async function main() {
       price: 600,
       address: 'Стадион «Газовик», ул. Терешковой, 10',
       isPopular: true,
-      images: img('Футбол', '96CEB4'),
       category: 'sport',
     },
     {
@@ -155,7 +200,6 @@ async function main() {
       price: 450,
       address: 'Кинотеатр «Космос», ул. Пролетарская, 24',
       isPopular: false,
-      images: img('Кино', 'FFEAA7'),
       category: 'cinema',
     },
     {
@@ -166,7 +210,6 @@ async function main() {
       price: 1800,
       address: 'Арт-пространство «Бункер», ул. Кирова, 15',
       isPopular: false,
-      images: img('Керамика', '98D8C8'),
       category: 'workshops',
     },
     {
@@ -177,7 +220,6 @@ async function main() {
       price: 500,
       address: 'Парк Победы, ул. Монтажников',
       isPopular: true,
-      images: img('Дети', 'F7DC6F'),
       category: 'kids',
     },
     // Июль 2026
@@ -189,7 +231,6 @@ async function main() {
       price: 0,
       address: 'Набережная р. Урал',
       isPopular: true,
-      images: img('Волна', 'DDA0DD'),
       category: 'festivals',
     },
     {
@@ -200,7 +241,6 @@ async function main() {
       price: 4500,
       address: 'ДК «Газовик», ул. Чкалова, 32',
       isPopular: true,
-      images: img('Zivert', 'FF6B6B'),
       category: 'concerts',
     },
     {
@@ -211,7 +251,6 @@ async function main() {
       price: 900,
       address: 'Оренбургский драматический театр, ул. Советская, 26',
       isPopular: false,
-      images: img('Свадьба', '4ECDC4'),
       category: 'theater',
     },
     {
@@ -222,7 +261,6 @@ async function main() {
       price: 200,
       address: 'Галерея «Арт-Оренбург», ул. Краснознамённая, 56',
       isPopular: false,
-      images: img('Фото', '45B7D1'),
       category: 'exhibitions',
     },
     {
@@ -233,7 +271,6 @@ async function main() {
       price: 0,
       address: 'Пляж «Салют», пос. Пригородный',
       isPopular: false,
-      images: img('Волейбол', '96CEB4'),
       category: 'sport',
     },
     {
@@ -244,7 +281,6 @@ async function main() {
       price: 300,
       address: 'Кинотеатр «Мир», пр. Победы, 80',
       isPopular: false,
-      images: img('Киномарафон', 'FFEAA7'),
       category: 'cinema',
     },
     {
@@ -255,7 +291,6 @@ async function main() {
       price: 400,
       address: 'Сквер имени Столыпина',
       isPopular: false,
-      images: img('Йога', '98D8C8'),
       category: 'workshops',
     },
     {
@@ -266,7 +301,6 @@ async function main() {
       price: 800,
       address: 'Цирк, ул. Володарского, 12',
       isPopular: true,
-      images: img('Цирк', 'F7DC6F'),
       category: 'kids',
     },
     // Август 2026
@@ -278,7 +312,6 @@ async function main() {
       price: 3800,
       address: 'Стадион «Газовик», ул. Терешковой, 10',
       isPopular: true,
-      images: img('Би-2', 'FF6B6B'),
       category: 'concerts',
     },
     {
@@ -289,7 +322,6 @@ async function main() {
       price: 1100,
       address: 'Оренбургский драматический театр, ул. Советская, 26',
       isPopular: false,
-      images: img('Вишневый+сад', '4ECDC4'),
       category: 'theater',
     },
     {
@@ -300,7 +332,6 @@ async function main() {
       price: 0,
       address: 'Набережная р. Урал',
       isPopular: true,
-      images: img('Еда', 'DDA0DD'),
       category: 'festivals',
     },
     {
@@ -311,7 +342,6 @@ async function main() {
       price: 400,
       address: 'Музей изобразительных искусств, ул. Каширина, 29',
       isPopular: false,
-      images: img('Город+X', '45B7D1'),
       category: 'exhibitions',
     },
     {
@@ -322,7 +352,6 @@ async function main() {
       price: 1200,
       address: 'Старт: пл. Победы',
       isPopular: true,
-      images: img('Марафон', '96CEB4'),
       category: 'sport',
     },
     {
@@ -333,7 +362,6 @@ async function main() {
       price: 0,
       address: 'Амфитеатр в Парке Победы',
       isPopular: false,
-      images: img('Гардемарины', 'FFEAA7'),
       category: 'cinema',
     },
     {
@@ -344,7 +372,6 @@ async function main() {
       price: 1500,
       address: 'Творческий кластер «Ключ», ул. Салмышская, 71',
       isPopular: false,
-      images: img('Акварель', '98D8C8'),
       category: 'workshops',
     },
     {
@@ -355,7 +382,6 @@ async function main() {
       price: 550,
       address: 'ТЮЗ, ул. Советская, 41',
       isPopular: false,
-      images: img('Поросята', 'F7DC6F'),
       category: 'kids',
     },
     // Сентябрь 2026 (конец лета)
@@ -367,7 +393,6 @@ async function main() {
       price: 3500,
       address: 'ДК «Газовик», ул. Чкалова, 32',
       isPopular: true,
-      images: img('Мот', 'FF6B6B'),
       category: 'concerts',
     },
     {
@@ -378,7 +403,6 @@ async function main() {
       price: 1500,
       address: 'Оренбургский драматический театр, ул. Советская, 26',
       isPopular: true,
-      images: img('Фестиваль', '4ECDC4'),
       category: 'theater',
     },
     {
@@ -389,7 +413,6 @@ async function main() {
       price: 0,
       address: 'Сквер у Дворца спорта «Газовик»',
       isPopular: false,
-      images: img('Ярмарка', 'DDA0DD'),
       category: 'festivals',
     },
     {
@@ -400,7 +423,6 @@ async function main() {
       price: 0,
       address: 'Краеведческий музей, ул. Пушкинская, 6',
       isPopular: true,
-      images: img('День+города', '45B7D1'),
       category: 'exhibitions',
     },
     {
@@ -411,7 +433,6 @@ async function main() {
       price: 300,
       address: 'Дворец спорта «Газовик»',
       isPopular: false,
-      images: img('Баскетбол', '96CEB4'),
       category: 'sport',
     },
     {
@@ -422,7 +443,6 @@ async function main() {
       price: 350,
       address: 'Кинотеатр «Космос», ул. Пролетарская, 24',
       isPopular: false,
-      images: img('Премьера', 'FFEAA7'),
       category: 'cinema',
     },
     {
@@ -433,7 +453,6 @@ async function main() {
       price: 2200,
       address: 'Гастрономическая студия «Вкус», ул. Ткачева, 8',
       isPopular: false,
-      images: img('Пельмени', '98D8C8'),
       category: 'workshops',
     },
     {
@@ -444,7 +463,6 @@ async function main() {
       price: 600,
       address: 'Парк имени 30-летия Победы',
       isPopular: false,
-      images: img('Пузыри', 'F7DC6F'),
       category: 'kids',
     },
   ];
@@ -460,7 +478,7 @@ async function main() {
           price: e.price,
           address: e.address,
           isPopular: e.isPopular,
-          images: e.images,
+          images: pickImage(e.category, e.title),
           categoryId: categories[e.category].id,
         },
       }),
