@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import { confirmAction } from '../utils/confirm';
 import { useAuthStore } from '../store/authStore';
 import { RootStackParamList } from '../types';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,42 +23,56 @@ export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
-    Alert.alert(
+    confirmAction(
       'Выход',
       'Вы уверены, что хотите выйти?',
-      [
-        { text: 'Отмена', style: 'cancel' },
-        {
-          text: 'Выйти',
-          style: 'destructive',
-          onPress: () => logout(),
-        },
-      ],
+      () => logout(),
+      'Выйти',
     );
   };
 
-  const menuItems = [
-    {
-      icon: 'create-outline',
-      title: 'Редактировать профиль',
-      onPress: () => navigation.navigate('EditProfile'),
-    },
-    {
-      icon: 'ticket-outline',
-      title: 'Мои билеты',
-      onPress: () => navigation.navigate('MyEvents' as never),
-    },
-    {
-      icon: 'heart-outline',
-      title: 'Избранное',
-      onPress: () => navigation.navigate('Favorites' as never),
-    },
-    {
-      icon: 'information-circle-outline',
-      title: 'О приложении',
-      onPress: () => navigation.navigate('About' as never),
-    },
-  ];
+  const menuItems = useMemo(() => {
+    const items: Array<{
+      icon: keyof typeof Ionicons.glyphMap;
+      title: string;
+      onPress: () => void;
+      admin?: boolean;
+    }> = [];
+
+    if (user?.role === 'ADMIN') {
+      items.push({
+        icon: 'shield-checkmark-outline',
+        title: 'Админ-панель',
+        onPress: () => navigation.navigate('Admin'),
+        admin: true,
+      });
+    }
+
+    items.push(
+      {
+        icon: 'create-outline',
+        title: 'Редактировать профиль',
+        onPress: () => navigation.navigate('EditProfile'),
+      },
+      {
+        icon: 'ticket-outline',
+        title: 'Мои билеты',
+        onPress: () => navigation.navigate('Main', { screen: 'MyEvents' }),
+      },
+      {
+        icon: 'heart-outline',
+        title: 'Избранное',
+        onPress: () => navigation.navigate('Main', { screen: 'Favorites' }),
+      },
+      {
+        icon: 'information-circle-outline',
+        title: 'О приложении',
+        onPress: () => navigation.navigate('About'),
+      },
+    );
+
+    return items;
+  }, [navigation, user?.role]);
 
   return (
     <ScrollView
@@ -97,13 +111,20 @@ export default function ProfileScreen() {
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => (
           <TouchableOpacity
-            key={index}
-            style={styles.menuItem}
+            key={item.title}
+            style={[styles.menuItem, item.admin && styles.menuItemAdmin]}
             onPress={item.onPress}
             activeOpacity={0.7}
           >
-            <Ionicons name={item.icon as any} size={22} color={COLORS.primary} style={styles.menuIcon} />
-            <Text style={styles.menuTitle}>{item.title}</Text>
+            <Ionicons
+              name={item.icon}
+              size={22}
+              color={item.admin ? COLORS.primaryDark : COLORS.primary}
+              style={styles.menuIcon}
+            />
+            <Text style={[styles.menuTitle, item.admin && styles.menuTitleAdmin]}>
+              {item.title}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
           </TouchableOpacity>
         ))}
@@ -188,6 +209,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightGray,
   },
+  menuItemAdmin: {
+    backgroundColor: '#F4EEFF',
+  },
   menuIcon: {
     fontSize: 22,
     marginRight: 14,
@@ -196,6 +220,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: SIZES.medium,
     color: COLORS.text,
+  },
+  menuTitleAdmin: {
+    fontWeight: '700',
+    color: COLORS.primaryDark,
   },
   menuArrow: {
     fontSize: 22,
@@ -207,7 +235,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: SIZES.radius,
     padding: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: COLORS.error,
   },

@@ -9,14 +9,14 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
-  Image,
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import EventCover from '../components/EventCover';
 import { eventsApi, categoriesApi } from '../api';
 import { Event, Category, RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -113,19 +113,14 @@ export default function HomeScreen() {
       onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
       activeOpacity={0.8}
     >
-      <Image
-        source={{ uri: item.images[0] || EVENT_IMAGE_FALLBACK }}
+      <EventCover
+        hero
+        title={item.title}
+        subtitle={formatDate(item.date)}
+        category={item.category}
+        height={160}
         style={styles.popularImage}
       />
-      <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
-        style={styles.popularOverlay}
-      >
-        <Text style={styles.popularTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
-        <Text style={styles.popularDate}>{formatDate(item.date)}</Text>
-      </LinearGradient>
     </TouchableOpacity>
   );
 
@@ -135,10 +130,7 @@ export default function HomeScreen() {
       onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
       activeOpacity={0.8}
     >
-      <Image
-        source={{ uri: item.images[0] || EVENT_IMAGE_FALLBACK }}
-        style={styles.eventImage}
-      />
+      <EventCover category={item.category} height={140} style={styles.eventImage} />
       <View style={styles.eventContent}>
         <View style={styles.eventHeader}>
           <View style={[styles.eventCategoryBadge, { backgroundColor: item.category?.color || COLORS.primary }]}>

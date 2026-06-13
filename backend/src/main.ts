@@ -2,8 +2,31 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { config as loadEnv } from 'dotenv';
+import { existsSync } from 'fs';
+import { join } from 'path';
+
+function ensureEnv() {
+  const envPath = join(process.cwd(), '.env');
+  if (existsSync(envPath)) {
+    loadEnv({ path: envPath });
+  }
+
+  const missing = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'DATABASE_URL'].filter(
+    (key) => !process.env[key],
+  );
+
+  if (missing.length > 0) {
+    console.error(
+      `\n✗ Не заданы переменные в backend/.env: ${missing.join(', ')}\n` +
+        '  Скопируйте файл: cp .env.example .env\n',
+    );
+    process.exit(1);
+  }
+}
 
 async function bootstrap() {
+  ensureEnv();
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({

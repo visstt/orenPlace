@@ -20,6 +20,7 @@ import { usersApi } from '../api/users';
 import { RootStackParamList, Category } from '../types';
 import { COLORS, SIZES } from '../utils/constants';
 import { useAuthStore } from '../store/authStore';
+import DatePickerField from '../components/DatePickerField';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type TabKey = 'events' | 'admins' | 'users' | 'analytics';
@@ -225,7 +226,6 @@ function AdminEventsForm() {
   const [address, setAddress] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [isPopular, setIsPopular] = useState(false);
-  const [images, setImages] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -245,10 +245,6 @@ function AdminEventsForm() {
     }
     setBusy(true);
     try {
-      const imgs = images
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
       await api.post('/events', {
         title: title.trim(),
         description: description.trim(),
@@ -258,14 +254,12 @@ function AdminEventsForm() {
         address: address.trim(),
         categoryId,
         isPopular,
-        images: imgs.length ? imgs : undefined,
       });
       Alert.alert('Готово', 'Мероприятие создано');
       setTitle('');
       setDescription('');
       setDate('');
       setAddress('');
-      setImages('');
     } catch (e: unknown) {
       const msg =
         (e as { response?: { data?: { message?: string | string[] } } })?.response
@@ -291,8 +285,8 @@ function AdminEventsForm() {
         onChangeText={setDescription}
         multiline
       />
-      <Text style={styles.label}>Дата (YYYY-MM-DD)</Text>
-      <TextInput style={styles.input} value={date} onChangeText={setDate} />
+      <Text style={styles.label}>Дата</Text>
+      <DatePickerField value={date} onChange={setDate} />
       <Text style={styles.label}>Время</Text>
       <TextInput style={styles.input} value={time} onChangeText={setTime} />
       <Text style={styles.label}>Цена</Text>
@@ -322,8 +316,6 @@ function AdminEventsForm() {
         <Text style={styles.label}>Популярное</Text>
         <Switch value={isPopular} onValueChange={setIsPopular} />
       </View>
-      <Text style={styles.label}>Картинки (URL через запятую)</Text>
-      <TextInput style={styles.input} value={images} onChangeText={setImages} />
       <TouchableOpacity
         style={[styles.primaryBtn, busy && styles.btnDisabled]}
         onPress={submit}

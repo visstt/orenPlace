@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../../utils/constants';
+import { COLORS, SIZES, SHADOWS } from '../../utils/constants';
 import { Event } from '../../types';
+import EventCover from './EventCover';
 
 const { width } = Dimensions.get('window');
 
@@ -47,12 +47,7 @@ export default function EventCard({
         onPress={onPress}
         activeOpacity={0.8}
       >
-        <Image
-          source={{
-            uri: event.images?.[0] || EVENT_IMAGE_FALLBACK,
-          }}
-          style={styles.compactImage}
-        />
+        <EventCover category={event.category} compact height={100} />
         <View style={styles.compactContent}>
           <Text style={styles.compactTitle} numberOfLines={2}>
             {event.title}
@@ -70,12 +65,7 @@ export default function EventCard({
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Image
-        source={{
-          uri: event.images?.[0] || EVENT_IMAGE_FALLBACK,
-        }}
-        style={styles.image}
-      />
+      <EventCover category={event.category} height={180} />
       <View style={styles.content}>
         <View style={styles.header}>
           <View
@@ -119,10 +109,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: 'hidden',
     ...SHADOWS.light,
-  },
-  image: {
-    width: '100%',
-    height: 180,
   },
   content: {
     padding: 14,
@@ -169,7 +155,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.primary,
   },
-  // Compact styles
   compactCard: {
     flexDirection: 'row',
     backgroundColor: COLORS.white,
@@ -177,10 +162,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     overflow: 'hidden',
     ...SHADOWS.light,
-  },
-  compactImage: {
-    width: 100,
-    height: 100,
   },
   compactContent: {
     flex: 1,

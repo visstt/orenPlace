@@ -6,13 +6,13 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  Image,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import EventCover from '../components/EventCover';
 import { favoritesApi } from '../api';
 import { Event, RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -46,10 +46,7 @@ export default function FavoritesScreen() {
       onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
       activeOpacity={0.8}
     >
-      <Image
-        source={{ uri: item.images?.[0] || EVENT_IMAGE_FALLBACK }}
-        style={styles.eventImage}
-      />
+      <EventCover category={item.category} height={140} style={styles.eventImage} />
       <View style={styles.eventContent}>
         <View style={styles.eventHeader}>
           <View style={[styles.categoryBadge, { backgroundColor: item.category?.color || COLORS.primary }]}>

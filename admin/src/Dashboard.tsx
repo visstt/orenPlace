@@ -58,7 +58,6 @@ const emptyEventForm = {
   address: '',
   categoryId: '',
   isPopular: false,
-  images: '',
 };
 
 export function Dashboard() {
@@ -144,10 +143,6 @@ function EventsSection() {
     setMsg('');
     setLoading(true);
     try {
-      const images = form.images
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
       await api('/events', {
         method: 'POST',
         body: JSON.stringify({
@@ -159,7 +154,6 @@ function EventsSection() {
           address: form.address,
           categoryId: form.categoryId,
           isPopular: form.isPopular,
-          images: images.length ? images : undefined,
         }),
       });
       setMsg('Мероприятие создано.');
@@ -252,14 +246,6 @@ function EventsSection() {
             onChange={(e) => setForm({ ...form, isPopular: e.target.checked })}
           />
           Популярное
-        </label>
-        <label>
-          Изображения (URL через запятую)
-          <input
-            value={form.images}
-            onChange={(e) => setForm({ ...form, images: e.target.value })}
-            placeholder="https://..."
-          />
         </label>
         <button type="submit" className="primary-btn" disabled={loading}>
           {loading ? 'Сохранение…' : 'Добавить мероприятие'}

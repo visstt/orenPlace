@@ -45,9 +45,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     try {
       await authApi.logout();
-    } catch {}
+    } catch {
+      // серверный logout необязателен — JWT stateless
+    }
     await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
-    set({ user: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false, isLoading: false });
   },
 
   loadUser: async () => {

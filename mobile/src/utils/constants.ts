@@ -78,7 +78,3 @@ const devApiUrl =
 
 /** Базовый URL API. В прод-сборке задайте EXPO_PUBLIC_API_URL (например https://example.com/api). */
 export const API_URL = envApiUrl ? normalizeApiUrl(envApiUrl) : devApiUrl;
-
-/** Заглушка, если у события нет фото */
-export const EVENT_IMAGE_FALLBACK =
-  'https://avatars.mds.yandex.net/get-afishanew/29022/4c4d033051e7209e94cebaa9103cc298/600x600';

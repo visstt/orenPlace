@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp, CommonActions } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { COLORS, SIZES, SHADOWS } from '../utils/constants';
 import { ticketsApi, eventsApi } from '../api';
@@ -18,10 +19,11 @@ import { RootStackParamList } from '../types';
 import { Ionicons } from '@expo/vector-icons';
 
 type RouteProps = RouteProp<RootStackParamList, 'PurchaseTicket'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function PurchaseTicketScreen() {
   const route = useRoute<RouteProps>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const { eventId } = route.params;
   const queryClient = useQueryClient();
 
@@ -39,26 +41,35 @@ export default function PurchaseTicketScreen() {
     select: (res) => res.data,
   });
 
+  const goToMyTickets = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Main',
+            state: {
+              routes: [{ name: 'MyEvents' }],
+              index: 0,
+            },
+          },
+        ],
+      }),
+    );
+  };
+
   const buyTicketMutation = useMutation({
-    mutationFn: () => {
-      console.log('Покупка билета для события:', eventId);
-      return ticketsApi.buy(eventId);
-    },
-    onSuccess: (data) => {
-      console.log('Билет успешно куплен:', data);
+    mutationFn: () => ticketsApi.buy(eventId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      queryClient.invalidateQueries({ queryKey: ['myTickets'] });
       setIsProcessing(false);
+
       Alert.alert(
         'Успешно! 🎉',
-        'Билет успешно приобретен! Вы можете найти его в разделе "Мои события".',
-        [
-          {
-            text: 'Перейти к билетам',
-            onPress: () => navigation.navigate('MyEvents' as never),
-          },
-        ]
+        `Билет на «${event?.title ?? 'мероприятие'}» куплен и добавлен в «Мои события».`,
       );
+
+      goToMyTickets();
     },
     onError: (error: any) => {
       console.error('Ошибка покупки билета:', error);

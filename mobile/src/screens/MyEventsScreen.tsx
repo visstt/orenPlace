@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -83,6 +83,43 @@ export default function MyEventsScreen() {
 
   const isLoading = todayLoading || upcomingLoading || allLoading;
 
+  const listData = useMemo(() => {
+    type ListItem =
+      | { type: 'header'; id: string; title: string; icon: keyof typeof Ionicons.glyphMap }
+      | (Ticket & { type: 'ticket' });
+
+    const items: ListItem[] = [];
+    const addSection = (
+      title: string,
+      icon: keyof typeof Ionicons.glyphMap,
+      tickets: Ticket[],
+    ) => {
+      if (!tickets.length) return;
+      items.push({ type: 'header', id: `header-${title}`, title, icon });
+      tickets.forEach((t) => items.push({ ...t, type: 'ticket' }));
+    };
+
+    const today = todayTickets || [];
+    const upcoming = (upcomingTickets || []).filter(
+      (t) => !today.some((tt) => tt.id === t.id),
+    );
+    const shownIds = new Set([
+      ...today.map((t) => t.id),
+      ...upcoming.map((t) => t.id),
+    ]);
+    const other = (allTickets || []).filter((t) => !shownIds.has(t.id));
+
+    addSection('Сегодня', 'today', today);
+    addSection('В ближайшие дни', 'calendar', upcoming);
+    addSection('Другие билеты', 'ticket-outline', other);
+
+    if (items.length === 0 && allTickets?.length) {
+      allTickets.forEach((t) => items.push({ ...t, type: 'ticket' }));
+    }
+
+    return items;
+  }, [todayTickets, upcomingTickets, allTickets]);
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -117,12 +154,7 @@ export default function MyEventsScreen() {
         </View>
       ) : (
         <FlatList
-          data={[
-            ...(todayTickets?.length ? [{ type: 'header', title: 'Сегодня', icon: 'today' }] : []),
-            ...(todayTickets || []).map((t: Ticket) => ({ ...t, type: 'ticket' })),
-            ...(upcomingTickets?.length ? [{ type: 'header', title: 'В ближайшие дни', icon: 'calendar' }] : []),
-            ...(upcomingTickets || []).map((t: Ticket) => ({ ...t, type: 'ticket' })),
-          ] as any[]}
+          data={listData}
           renderItem={({ item }) => {
             if (item.type === 'header') {
               return (
@@ -132,10 +164,10 @@ export default function MyEventsScreen() {
                 </View>
               );
             }
-            return renderTicket({ item: item as Ticket });
+            return renderTicket({ item });
           }}
-          keyExtractor={(item, index) =>
-            item.type === 'header' ? `header-${index}` : item.id
+          keyExtractor={(item) =>
+            item.type === 'header' ? item.id : item.id
           }
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
@@ -181,6 +213,8 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: SIZES.padding,
+    paddingBottom: 100,
+    flexGrow: 1,
   },
   sectionHeader: {
     flexDirection: 'row',

@@ -31,62 +31,6 @@ function summerDate(month: number, day: number): Date {
   return new Date(Date.UTC(2026, month - 1, day, 12, 0, 0));
 }
 
-/** Фото с CDN Яндекс.Афиши (avatars.mds.yandex.net) */
-const yandexImages: Record<CategoryKey, string[]> = {
-  concerts: [
-    'https://avatars.mds.yandex.net/get-afishanew/29022/4c4d033051e7209e94cebaa9103cc298/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/5109582/ab306a075ef97de9ef4e008f21a3ae47/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/4395007/fad2d0ff6defd2edffee9016a4fa138f/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/34116/f137926505c8921cffb2e7e7421bbfbe/600x600',
-  ],
-  theater: [
-    'https://avatars.mds.yandex.net/get-afishanew/35821/0d264289fa6e9548dbfaf41829846887/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/4487581/07af57418e1845cab81f4ecec5cc6cb3/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/31447/ad3610ce992f4942823470a1b9669c86/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/21422/e1dbe303c5cff5c78f4efa55a2ffeee5/600x600',
-  ],
-  exhibitions: [
-    'https://avatars.mds.yandex.net/get-afishanew/5098259/12e5b0a2308f0cf8c6c7a77392709b64/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/5098259/f9697c3c146104c243762d79f6ff5ae2/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/36842/56fa9fc3f7c215ec874b38e1efbe5ec4/600x600',
-  ],
-  sport: [
-    'https://avatars.mds.yandex.net/get-afishanew/5109582/a6484e20128e90ac8b9f4a5323612dc3/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/23222/d9312603627ef8cd84e15c1ee54474a8/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/23222/80f54b708870dcaa8c499c7db40ae458/600x600',
-  ],
-  cinema: [
-    'https://avatars.mds.yandex.net/get-afishanew/21422/2e56b4898558973dc375d941c1583272/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/21422/c67eb58d894429526871d5c9cbd7f00d/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/4395007/189903184ee744ee731612c8bded7633/600x600',
-  ],
-  festivals: [
-    'https://avatars.mds.yandex.net/get-afishanew/29022/4c4d033051e7209e94cebaa9103cc298/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/35821/0d264289fa6e9548dbfaf41829846887/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/4487581/07af57418e1845cab81f4ecec5cc6cb3/600x600',
-  ],
-  workshops: [
-    'https://avatars.mds.yandex.net/get-afishanew/5098259/14a95af3d713a6790015ca4e7a24d971/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/31447/3783cbd510b4e35275363250fa09784a/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/36842/56fa9fc3f7c215ec874b38e1efbe5ec4/600x600',
-  ],
-  kids: [
-    'https://avatars.mds.yandex.net/get-afishanew/34116/f137926505c8921cffb2e7e7421bbfbe/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/4395007/fad2d0ff6defd2edffee9016a4fa138f/600x600',
-    'https://avatars.mds.yandex.net/get-afishanew/23222/80f54b708870dcaa8c499c7db40ae458/600x600',
-  ],
-};
-
-function pickImage(category: CategoryKey, title: string): string[] {
-  const pool = yandexImages[category];
-  let hash = 0;
-  for (let i = 0; i < title.length; i++) {
-    hash = (hash + title.charCodeAt(i)) | 0;
-  }
-  const idx = Math.abs(hash) % pool.length;
-  return [pool[idx]];
-}
-
 async function main() {
   console.log('🗑 Очистка старых данных...');
   await prisma.ticket.deleteMany();
@@ -478,7 +422,7 @@ async function main() {
           price: e.price,
           address: e.address,
           isPopular: e.isPopular,
-          images: pickImage(e.category, e.title),
+          images: [],
           categoryId: categories[e.category].id,
         },
       }),

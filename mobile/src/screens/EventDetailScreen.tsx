@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
   Alert,
   Dimensions,
@@ -13,7 +12,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { COLORS, EVENT_IMAGE_FALLBACK, SIZES, SHADOWS } from '../utils/constants';
+import { COLORS, SIZES, SHADOWS } from '../utils/constants';
+import EventCover from '../components/EventCover';
 import { eventsApi, ticketsApi } from '../api';
 import { RootStackParamList } from '../types';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -68,16 +68,7 @@ export default function EventDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Gallery */}
         <View style={styles.imageContainer}>
-          <Image
-            source={{
-              uri: event.images[0] || EVENT_IMAGE_FALLBACK,
-            }}
-            style={styles.image}
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.6)']}
-            style={styles.imageOverlay}
-          />
+          <EventCover category={event.category} height={300} />
           <TouchableOpacity
             style={styles.favoriteButton}
             onPress={() => toggleFavorite(event.id)}
@@ -176,17 +167,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 300,
     position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
   },
   favoriteButton: {
     position: 'absolute',

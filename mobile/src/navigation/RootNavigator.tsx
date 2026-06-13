@@ -33,6 +33,7 @@ export default function RootNavigator() {
 
   return (
     <Stack.Navigator
+      key={isAuthenticated ? 'app' : 'auth'}
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: COLORS.background },

@@ -1,3 +1,5 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
+
 export interface User {
   id: string;
   name: string;
@@ -78,7 +80,7 @@ export interface EventQueryParams {
 }
 
 export type RootStackParamList = {
-  Main: undefined;
+  Main: NavigatorScreenParams<BottomTabParamList>;
   Auth: undefined;
   Login: undefined;
   Register: undefined;
